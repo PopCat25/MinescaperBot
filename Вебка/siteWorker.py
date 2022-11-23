@@ -3,15 +3,15 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from siteWorker import *
 
-def mineCountPars (driver): #Парсер количества мин
+def mineCountPars (driver:webdriver.Chrome): #Парсер количества мин
     
     mineCount = 0
-    for i in (1,10,100):
+    for i in (1, 10, 100):
         for j in filter (str.isdigit ,driver.find_element(By.XPATH, f"//*[@id=\"top_area_mines_{i}\"]").get_attribute("class")):
             mineCount += i * int(j)
     return mineCount
 
-def gameFieldPars (h,w,driver): #Парсер игрового поля
+def gameFieldPars (h:int, w:int, driver:webdriver.Chrome): #Парсер игрового поля
     
     field = [[0] * w for i in range(h)] # Создание поля шириной w и высотой h
     for j in range (h): 
@@ -21,7 +21,7 @@ def gameFieldPars (h,w,driver): #Парсер игрового поля
             field[j][i] = cellPars(elementClassLine)
     return field
 
-def checkGameConsist (driver,win,lose):     # проверка конца игры, в случае луза ресет и возврат + 1 к лузам, при победе ресет и возврат +1 к победам
+def checkGameConsist (driver:webdriver.Chrome, win:int, lose:int):     # проверка конца игры, в случае луза ресет и возврат + 1 к лузам, при победе ресет и возврат +1 к победам
 
     reset = driver.find_element(By.XPATH, "//*[@id=\"top_area_face\"]") #Храним кнопку ресета игры
     if reset.get_attribute("class") == "top-area-face zoomable hd_top-area-face-lose":  #Условие проигрыша
@@ -35,7 +35,7 @@ def checkGameConsist (driver,win,lose):     # проверка конца игр
     return win + 0, lose + 0
 
 
-def cellPars (elementClassLine):
+def cellPars (elementClassLine:list[str]):
 
     if elementClassLine[2] == "hd_closed" and len(elementClassLine) == 3 : # Если ячейка закрыта
         return "*"
