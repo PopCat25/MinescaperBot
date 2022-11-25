@@ -6,7 +6,7 @@ from logic import *
 root = Tk() # создаем корневой объект - окно
 root.title("СапёрБот") # устанавливаем заголовок окна
 root.geometry("300x250+600+200") # устанавливаем размеры окна
-root.resizable(False, False)
+root.resizable(False, False)    #Запрет на изменения размера окна
 
 label = ttk.Label(text="Выберите уровень сложности:")
 buttonEasy = ttk.Button(text="Новичок 9х9 клеток ", command= lambda difLevel = 1 :start(difLevel))
