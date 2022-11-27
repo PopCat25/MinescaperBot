@@ -48,3 +48,5 @@ def cellPars (elementClassLine:list[str]):
 
     elif elementClassLine[2] == "hd_opened": # Получение количества мин рядом с ячейкой
         return str(elementClassLine[3]).split("e")[1] # класс представляет из себя строку "cell size24 hd_opened hd_type1" можно расплитить по пробелу а потом элемент с 3 индексом  по "e" тогда в 1 индексе будет число мин
+
+    return "broke"

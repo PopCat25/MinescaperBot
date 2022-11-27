@@ -9,7 +9,8 @@ from random import *
 
 def start(difLevel):
     try:
-        url = f"https://minesweeper.online/ru/start/{difLevel}"
+        url = f"https://minesweeper.online/ru/start/{difLevel}" 
+        # url = "https://minesweeper.online/ru/game/1779637747"
         driver = webdriver.Chrome(executable_path="\\chromedriver.exe")
         driver.get(url = url)
         time.sleep(3)  # Ожидаем загрузки страницы
@@ -33,11 +34,17 @@ def start(difLevel):
 
             os.system('CLS')    # Очищение консоли
             
+            print("Игровое поле")
             print(f"Осталось мин: {mineCount}") 
             for row in field:
                 print(row)
             
-            findProbabilityField(field)
+            probabilityField = findProbabilityField(field)  #Находим вероятность нахождения мин
+
+            print("\n") 
+            print("Поле вероятности \n") 
+            for row in probabilityField:
+                print(row)
 
 
             
@@ -50,8 +57,3 @@ def start(difLevel):
         print(ex)
     finally:
         driver.quit()
-
-
-# for (int x = 0; x < width; x++)
-#     for (int y = 0; y < height; y++)
-#         field[x][y].setGroup(groups); // создание групп
