@@ -2,6 +2,8 @@ from selenium import *
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from siteWorker import *
+import sys 
+import random
 
 def mineCountPars (driver:webdriver.Chrome): #Парсер количества мин
     
@@ -41,7 +43,7 @@ def cellPars (elementClassLine:list[str]):
         return "*"
 
     elif elementClassLine[2] == "hd_closed" and elementClassLine[3] == "hd_flag": # Если ячейка закрыта, и на ней флаг
-        return "F"
+        return "*"      #пока поставил '*' что бы не ломалась программа при победе
 
     elif elementClassLine[2] == "hd_closed" and elementClassLine[3] == "start": #Если ячейка закрыта и на ней крестик, это для режима без угадывания
         return "x"
@@ -49,4 +51,36 @@ def cellPars (elementClassLine:list[str]):
     elif elementClassLine[2] == "hd_opened": # Получение количества мин рядом с ячейкой
         return str(elementClassLine[3]).split("e")[1] # класс представляет из себя строку "cell size24 hd_opened hd_type1" можно расплитить по пробелу а потом элемент с 3 индексом  по "e" тогда в 1 индексе будет число мин
 
-    return "broke"
+    return "*"
+
+def makeTurn (probabilityField:list,driver:webdriver.Chrome):
+    
+    leastExplosiveCells = []                                                                                #Список клеток с наименьшей вероятность взрыва. Пример одного элемента: [minProbability,xIndex,yIndex]
+
+    minProbability =  sys.maxsize                                                                           # эталон для сравнивания
+    xIndex,yIndex = 0,0                                                                                     #Индексы для поиска ячейки
+
+    for row in probabilityField:                                                                            #В листе вероятностей ищем наименьшее значение
+        for cell in row:
+            if type(cell) is not str and cell > 0 and cell < minProbability:                                # условие для поиска наименьшего значения вероятности тк пустые ячейки нас не интересуют вероятность должна быть больше нуля но меньше эталона
+                minProbability = cell
+    
+    for row in probabilityField:
+        for cell in row:
+            if cell == minProbability:
+                leastExplosiveCells.append([minProbability,xIndex,yIndex])
+            xIndex += 1
+        xIndex = 0
+        yIndex += 1
+
+    if minProbability == sys.maxsize:
+        element = driver.find_element(By.XPATH, f"//*[@id=\"cell_{2}_{2}\"]")                               #Временное решение проблемы первого хода, координаты не нулевые что бы у алгоритма было 8 вариантов вместо 3
+        element.click()
+        return
+
+    randomLeastExplosiveCells = random.choice(leastExplosiveCells)
+
+    element = driver.find_element(By.XPATH, f"//*[@id=\"cell_{randomLeastExplosiveCells[1]}_{randomLeastExplosiveCells[2]}\"]")
+    element.click()
+
+    # print(leastExplosiveCells)
