@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from siteWorker import *
 import sys 
 import random
+import time
 
 def mineCountPars (driver:webdriver.Chrome): #Парсер количества мин
     
@@ -15,22 +16,29 @@ def mineCountPars (driver:webdriver.Chrome): #Парсер количества 
 
 def gameFieldPars (h:int, w:int, driver:webdriver.Chrome): #Парсер игрового поля
     
+    xMarkIndexY = None
+    xMarkIndexX = None
     field = [[0] * w for i in range(h)] # Создание поля шириной w и высотой h
     for j in range (h): 
         for i in range (w):
             element = driver.find_element(By.XPATH, f"//*[@id=\"cell_{i}_{j}\"]")
             elementClassLine = element.get_attribute("class").split()                    
             field[j][i] = cellPars(elementClassLine)
-    return field
+            if field[j][i] == "x":
+                xMarkIndexY = j
+                xMarkIndexX = i
+    return field, xMarkIndexY, xMarkIndexX
 
 def checkGameConsist (driver:webdriver.Chrome, win:int, lose:int):     # проверка конца игры, в случае луза ресет и возврат + 1 к лузам, при победе ресет и возврат +1 к победам
 
     reset = driver.find_element(By.XPATH, "//*[@id=\"top_area_face\"]") #Храним кнопку ресета игры
     if reset.get_attribute("class") == "top-area-face zoomable hd_top-area-face-lose":  #Условие проигрыша
+        time.sleep(5)                                                                   #Небольшая пауза что бы немного погрустить
         reset.click()
         return win + 0, lose + 1
 
     elif reset.get_attribute("class") == "top-area-face zoomable hd_top-area-face-win": #Условие победы
+        time.sleep(5)                                                                   #Небольшая пауза что бы насладиться победой
         reset.click()
         return win + 1, lose + 0
         
@@ -73,8 +81,10 @@ def makeTurn (probabilityField:list,driver:webdriver.Chrome):
         xIndex = 0
         yIndex += 1
 
-    if minProbability == sys.maxsize:
-        element = driver.find_element(By.XPATH, f"//*[@id=\"cell_{2}_{2}\"]")                               #Временное решение проблемы первого хода, координаты не нулевые что бы у алгоритма было 8 вариантов вместо 3
+    if minProbability == sys.maxsize:                                                           #Ход на случай если все клетки закрыты
+        randomY = random.randint(1, len(probabilityField) - 1)                                  #Индексы не угловые что бы было не 3 или 5 соседей а 8   
+        randomX = random.randint(1, len(probabilityField[0]) - 1)
+        element = driver.find_element(By.XPATH, f"//*[@id=\"cell_{randomX}_{randomY}\"]")                             
         element.click()
         return
 
@@ -84,3 +94,24 @@ def makeTurn (probabilityField:list,driver:webdriver.Chrome):
     element.click()
 
     # print(leastExplosiveCells)
+
+
+# def  newfParser (h:int, w:int, driver:webdriver.Chrome):
+
+#     a43 = driver.find_element(By.ID,"A43")
+#     elements = a43.find_elements(By.CLASS_NAME,("cell"))
+#     # print(elements)
+#     # print(elements[0].get_attribute("class"))
+    
+
+#     print()
+        
+        
+#     # field = [[0] * w for i in range(h)] # Создание поля шириной w и высотой h
+#     # for j in range (h): 
+#     #     for i in range (w):
+#     #         element = driver.find_element(By.XPATH, f"//*[@id=\"cell_{i}_{j}\"]")
+#     #         driver.fi
+#     #         elementClassLine = element.get_attribute("class").split()                    
+#     #         field[j][i] = cellPars(elementClassLine)
+#     # return field
