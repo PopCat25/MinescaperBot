@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from siteWorker import *
 from algoritmMetods import *
 from random import *
+from bs4 import BeautifulSoup
 from selenium.webdriver.chrome.options import Options   #Ипорт для того что бы была возможность настроить webdriver и сохранить это в профиль
 import time
 import os
@@ -34,46 +35,42 @@ def start(difLevel):
 
         win, lose = 0, 0
 
-
-        # while True:
-        #     worktime2 = time.time()
-        #     newfParser(h, w, driver)
-        #     print(time.time() - worktime2)
-        #     exit()
-            
         while True:
-            worktime = time.time()                                                              #Переменная для измерения времени работы парсера
-            mineCount = mineCountPars(driver)                                                   # Вызываем функцию из сайтворкера, что бы узнать кол-во мин 
-            field,xMarkIndexY,xMarkIndexX = gameFieldPars(h, w, driver)                         # Вызываем функцию из сайтворкера для парсинга игрового поля, это кортеж потому что мы ещё передаём координаты крестика для режима игры без угадывания, если крестика нет возвращается field, None,None
-            
-            os.system('CLS')                                                                    # Очищение консоли
-            print(f"Игровое поле     Время парсинга: {time.time()-worktime}")
-            print(f"Осталось мин: {mineCount}") 
-            for row in field:
-                print(row)
+            worktime = time.time()                                                                  #Переменная для измерения времени работы парсера
+            mineCount = mineCountPars(driver)                                                       # Вызываем функцию из сайтворкера, что бы узнать кол-во мин 
+            field,xMarkIndexY,xMarkIndexX = gameFieldPars(h, w, driver)                             # Вызываем функцию из сайтворкера для парсинга игрового поля, это кортеж потому что мы ещё передаём координаты крестика для режима игры без угадывания, если крестика нет возвращается field, None,None
+            parserTime = time.time()-worktime
 
-            
-            if xMarkIndexY == None and xMarkIndexY == None:                                     #Если крестика нет то вычисляем поле вероятности, это что бы не переписывать algoritmMetods         Проверка на наличие крестика на поле, если есть то тыкаем в него, иначе совершаем обычный ход
+            if xMarkIndexY == None and xMarkIndexY == None:                                         #Если крестика нет то вычисляем поле вероятности, это что бы не переписывать algoritmMetods         Проверка на наличие крестика на поле, если есть то тыкаем в него, иначе совершаем обычный ход
                 worktime = time.time()                                                              #Переменная для измерения времени работы алгоритма вычисления вероятностей
-                probabilityField = findProbabilityField(field)                                  #Находим вероятность нахождения мин
-                print("\n") 
-                print(f"Поле вероятности   Время вычислений: {time.time()-worktime} \n") 
-                for row in probabilityField:
-                    print(row)
-
+                probabilityField = findProbabilityField(field)                                      #Находим вероятность нахождения мин
+                probabilityTime = time.time()-worktime
                 makeTurn(probabilityField,driver)
             else:
                 element = driver.find_element(By.XPATH, f"//*[@id=\"cell_{xMarkIndexX}_{xMarkIndexY}\"]")
                 element.click()
-                # xMarkIndexY,xMarkIndexX = None,None
 
-            
-            win, lose = checkGameConsist(driver, win, lose) #помимо ресета в случае конца игры ещё делаем +1 в счётчикам винов\лузов
+
+            win, lose = checkGameConsist(driver, win, lose)                                         #помимо ресета в случае конца игры ещё делаем +1 в счётчикам винов\лузов
             print(f"Побед: {win} Поражений: {lose}")
-
+            os.system('CLS')                                                                        # Очищение консоли
+            printGame(parserTime,probabilityTime,field,mineCount,probabilityField)                  #Метод для одновременного вывода информации в консоль что бы консоль не моргала               
 
 
     except Exception as ex :
         print(ex)
-    finally:
-        driver.quit()
+    # finally:
+    #     #driver.quit()                #Пока что не закрываем окно браузераы
+
+
+
+def printGame(parserTime:int,probabilityTime:int,field:list[list[int]],mineCount:int,probabilityField:list):        #Метод кривой но позволяет консоли не моргать
+    print(f"Игровое поле     Время парсинга: {parserTime}")
+    print(f"Осталось мин: {mineCount}") 
+    for row in field:
+        print(row)
+
+    print("\n") 
+    print(f"Поле вероятности   Время вычислений: {probabilityTime} \n") 
+    for row in probabilityField:
+        print(row)
