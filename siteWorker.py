@@ -42,14 +42,12 @@ def checkGameConsist (driver:webdriver.Chrome, win:int, lose:int):     # про�
 
     reset = driver.find_element(By.XPATH, "//*[@id=\"top_area_face\"]") #Храним кнопку ресета игры
     if reset.get_attribute("class") == "top-area-face zoomable hd_top-area-face-lose":  #Условие проигрыша
-        print(f"Побед: {win} Поражений: {lose}")
-        time.sleep(5)                                                                   #Небольшая пауза что бы немного погрустить
+        time.sleep(2)                                                                   #Небольшая пауза что бы немного погрустить
         reset.click()
         return win + 0, lose + 1
 
     elif reset.get_attribute("class") == "top-area-face zoomable hd_top-area-face-win": #Условие победы
-        print(f"Побед: {win} Поражений: {lose}")
-        time.sleep(5)                                                                   #Небольшая пауза что бы насладиться победой
+        time.sleep(2)                                                                   #Небольшая пауза что бы насладиться победой
         reset.click()
         return win + 1, lose + 0
         

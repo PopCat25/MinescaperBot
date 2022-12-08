@@ -41,20 +41,21 @@ def start(difLevel):
             field,xMarkIndexY,xMarkIndexX = gameFieldPars(h, w, driver)                             # Вызываем функцию из сайтворкера для парсинга игрового поля, это кортеж потому что мы ещё передаём координаты крестика для режима игры без угадывания, если крестика нет возвращается field, None,None
             parserTime = time.time()-worktime
 
+            probabilityTime = 0                                                                     #Что бы не ломать вывод с помощью printGame потому что probabilityTime передавать нужно 
+            probabilityField = [[]]                                                                 #Так же что бы не ломать вывод
             if xMarkIndexY == None and xMarkIndexY == None:                                         #Если крестика нет то вычисляем поле вероятности, это что бы не переписывать algoritmMetods         Проверка на наличие крестика на поле, если есть то тыкаем в него, иначе совершаем обычный ход
                 worktime = time.time()                                                              #Переменная для измерения времени работы алгоритма вычисления вероятностей
                 probabilityField = findProbabilityField(field)                                      #Находим вероятность нахождения мин
                 probabilityTime = time.time()-worktime
-                makeTurn(probabilityField,driver)
+                makeTurn(probabilityField,driver)                                                   #Делаем ход
             else:
                 element = driver.find_element(By.XPATH, f"//*[@id=\"cell_{xMarkIndexX}_{xMarkIndexY}\"]")
                 element.click()
 
 
             win, lose = checkGameConsist(driver, win, lose)                                         #помимо ресета в случае конца игры ещё делаем +1 в счётчикам винов\лузов
-            print(f"Побед: {win} Поражений: {lose}")
             os.system('CLS')                                                                        # Очищение консоли
-            printGame(parserTime,probabilityTime,field,mineCount,probabilityField)                  #Метод для одновременного вывода информации в консоль что бы консоль не моргала               
+            printGame(parserTime,probabilityTime,field,mineCount,probabilityField,win,lose)         #Метод для одновременного вывода информации в консоль что бы консоль не моргала               
 
 
     except Exception as ex :
@@ -64,7 +65,7 @@ def start(difLevel):
 
 
 
-def printGame(parserTime:int,probabilityTime:int,field:list[list[int]],mineCount:int,probabilityField:list):        #Метод кривой но позволяет консоли не моргать
+def printGame(parserTime:int,probabilityTime:int,field:list[list[int]],mineCount:int,probabilityField:list,win:int,lose:int):        #Метод кривой но позволяет консоли не моргать
     print(f"Игровое поле     Время парсинга: {parserTime}")
     print(f"Осталось мин: {mineCount}") 
     for row in field:
@@ -74,3 +75,4 @@ def printGame(parserTime:int,probabilityTime:int,field:list[list[int]],mineCount
     print(f"Поле вероятности   Время вычислений: {probabilityTime} \n") 
     for row in probabilityField:
         print(row)
+    print(f"Побед: {win} Поражений: {lose}")
