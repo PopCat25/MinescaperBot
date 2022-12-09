@@ -123,7 +123,8 @@ def correctProbability (probabilityField:list,listOfneighborCells:list,field:lis
 
                     for neighborRecord in listOfneighborCells:                                                          #В этом цикле мы будем домножать соседние ячейки на groupProbabilitySum
                         if neighborRecord[0][2] == yIndex and neighborRecord[0][1] == xIndex:                           #Опять ищем подходящие записи о ячейке
-                            probabilityField[neighborRecord[0][5]][neighborRecord[0][4]] = probabilityField[neighborRecord[0][5]][neighborRecord[0][4]]*(int(neighborRecord[0][0])/groupProbabilitySum) #Присваиваем ячейке значение равное: Значение ячейки*(Количество мин в смежной открытой для неё ячейки)
+                            if groupProbabilitySum != 0:                                                                #Фикс для бага divide by zero
+                                probabilityField[neighborRecord[0][5]][neighborRecord[0][4]] = probabilityField[neighborRecord[0][5]][neighborRecord[0][4]]*(int(neighborRecord[0][0])/groupProbabilitySum) #Присваиваем ячейке значение равное: Значение ячейки*(Количество мин в смежной открытой для неё ячейки)
                 xIndex += 1
             xIndex = 0
             yIndex += 1
